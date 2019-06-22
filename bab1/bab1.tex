@@ -1,0 +1,90 @@
+\vspace{0ex}
+\chapter {PENDAHULUAN}
+
+Bab ini menjelaskan konteks tugas akhir yang akan dikerjakan, termasuk latar belakang, rumusan masalah, batasan masalah, tujuan, manfaat, metodologi, dan sistematika penulisan.
+
+\section{Latar Belakang}
+\par Teknologi informasi pada abad ini mengalami perkembangan yang pesat dan mempengaruhi hampir seluruh aspek dalam kehidupan manusia. Teknologi perangkat bergerak atau \textit{mobile device} menjadi salah satu teknologi yang saat ini banyak memunculkan inovasi - inovasi baru. Di tahun 2000, komunikasi dilakukan melalui banyak jaringan. Telepon genggam hanya bisa untuk menelepon dan menerima pesan singkat. Sekarang, pemesanan transportasi, pemesanan makanan, \textit{fintech} atau teknologi finansial, situs belanja online dan lain-lain banyak dikembangkan di perangkat bergerak.  
+
+\par Selain teknologi berbasis perangkat bergerak, teknologi yang sedang gencar-gencarnya dikembangkan saat ini adalah \textit{Artificial Intelligence} atau Kecerdasan Buatan. Kecerdasan buatan didefinisikan sebagai kecerdasan entitas ilmiah yang dimasukkan ke dalam sebuah mesin agar dapat melakukan pekerjaan seperti yang dapat dilakukan manusia \cite{ai_def}. Beberapa macam bidang yang menggunakan kecerdasan buatan antara lain sistem pakar, permainan komputer (games), logika fuzzy, jaringan syaraf tiruan dan robotika. Pada pengolahan citra digital kecerdasan buatan juga digunakan untuk mendeteksi wajah, kebakaran, keributan dan lain-lain.
+\par Pada Tugas Akhir ini, penulis akan mencoba mengimplementasikan suatu sistem untuk mengidentifikasi jenis daun berbasis android. Cara kerja aplikasi yang diusulkan adalah pengguna menangkap gambar daun dari ponsel mereka, lalu sistem akan mengirim gambar tersebut ke server. Di server gambar daun tersebut akan melalui proses klasifikasi dengan kecerdasan buatan. Metode yang akan digunakan untuk mengklasifikasi daun tersebut adalah \textit{Transfer Learning}. Kemudian hasil dari klasifikasi tersebut akan dikirim lagi ke ponsel pengguna. 
+\par Penulis berharap dengan adanya aplikasi ini akan meningkatkan pengetahuan pengguna tentang manfaat daun-daun di sekitarnya.
+
+\section {Rumusan Masalah}
+
+Permasalahan yang akan diselesaikan pada tugas akhir ini adalah sebagai berikut:
+
+\begin {enumerate}
+\item Bagaimana mengimplementasikan \textit{transfer learning} untuk mendeteksi jenis daun? 
+\item Bagaimana mengembangkan sebuah aplikasi berbasis android yang mengirim gambar ke server dan menerima balasan berupa jenis dan manfaat daun?
+\item Bagaimana melakukan proses klasifikasi daun pada server?
+\item Arsitektur \textit{transfer learning} mana yang lebih akurat dalam mendeteksi jenis daun? 
+\end {enumerate}
+
+\section {Batasan Masalah}
+
+Batasan masalah yang terdapat pada Tugas Akhir ini adalah sebagai berikut : 
+\begin {enumerate}
+\item Implementasi program menggunakan bahasa pemrograman Java untuk Android dan Python untuk mendeteksi daun. 
+\item Implementasi aplikasi android untuk mengirim gambar daun ke server dan menampilkan balasan berupa jenis daun.
+\item Sistem pengenalan daun dirancang untuk deteksi satu daun dalam satu gambar. 
+\item Dataset diperoleh dari https://archive.ics.uci.edu/ml/datasets/leaf yang ditambahkan dengan dataset dari penulis sendiri. 
+\end {enumerate}
+
+\section {Tujuan}
+
+Tujuan pembuatan Tugas Akhir ini adalah merancang aplikasi pendeteksi daun online berbasis perangkat bergerak android. 
+
+\section{Manfaat}
+Dengan adanya Tugas Akhir ini, diharapkan dapat memberikan manfaat kepada pengguna perangkat bergerak berbasis android sebagai aplikasi mobile yang memberikan informasi mengenai jenis daun. 
+
+\section {Metodologi}
+
+Metodologi pengerjaan yang digunakan pada tugas akhir ini memiliki beberapa tahapan. Tahapan-tahapan tersebut adalah sebagai berikut:
+
+\begin{enumerate}
+\item Penyusunan proposal tugas akhir\\
+Tahapan awal dari Tugas Akhir ini adalah penyusunan Proposal Tugas Akhir yang berisi pendahuluan, deskripsi dan gagasan metode-metode yang dibuat dalam Tugas Akhir ini.
+Pendahuluan ini terdiri dari latar belakang diajukannya Tugas Akhir, rumusan masalah dan batasan masalah yang ditetapkan, serta manfaat dari hasil pembuatan Tugas Akhir ini. Selain itu, dijabarkan pula tinjauan pustaka yang digunakan sebagai referensi pendukung pembuatan Tugas Akhir. Terdapat pula sub bab jadwal kegiatan yang menjelaskan jadwal pengerjaan Tugas Akhir.
+\item Studi literatur\\
+Pada tahap ini dilakukan pencarian literatur berupa jurnal yang digunakan sebagai referensi untuk pengerjaan tugas akhir ini. Literatur yang dipelajari pada pengerjaan tugas akhir ini
+berasal dari jurnal ilmiah yang diambil dari berbagai sumber di internet, serta berbagai literatur online tambahan terkait Keras dan Android.
+\item Implementasi Perangkat Lunak\\
+Pada tahap ini akan dilaksanakan implementasi metode dan algoritma yang telah direncanakan. Implementasi sistem menggunakan Python 3 sebagai bahasa pemrograman,
+TensorFlow dan Keras sebagai framework, serta library pendukung lainya. Untuk aplikasi android sistem akan menggunakan bahasa pemrograman Java.
+\item Pengujian dan Evaluasi\\
+Tahap pengujian dan evaluasi dilakukan menggunakan dataset Daun untuk mengetahui hasil dan performa arsitektur yang telah dibangun. Evaluasi dilakukan dengan metode pengukuran akurasi.
+\item Penyusunan buku\\
+Pada tahap ini dilakukan penyusunan buku yang menjelaskan seluruh konsep, teori dasar dari metode yang digunakan, implementasi, serta hasil yang telah dikerjakan sebagai dokumentasi dari pelaksanaan Tugas Akhir.
+\end{enumerate}
+
+\section {Sistematika Penulisan}
+
+Sistematika laporan tugas akhir yang akan digunakan adalah sebagai berikut:
+
+\begin{enumerate}
+\item Bab 1 : PENDAHULUAN
+
+Bab ini menjelaskan konteks tugas akhir yang akan dikerjakan, termasuk latar belakang, rumusan masalah, batasan masalah, tujuan, manfaat, metodologi, dan sistematika penulisan.
+
+\item Bab 2 : TINJAUAN PUSTAKA
+
+Bab ini berisi kajian teori dari metode dan algoritma yang digunakan dalam penyusunan Tugas Akhir ini. Secara garis besar, bab ini berisi tentang Android, Transfer Learning dan library yang digunakan.
+
+\item Bab 3 :  PERANCANGAN SISTEM
+
+Bab ini berisi pembahasan mengenai perancangan dari metode Transfer Learning yang digunakan untuk pengenalan ekspresi daun pada data gambar.
+
+\item Bab 4 : IMPLEMENTASI
+
+Bab ini membahas implementasi dari perancangan yang telah dibuat pada bab sebelumnya. Penjelasan berupa kode yang digunakan untuk proses implementasi.
+
+\item Bab 5 : PENGUJIAN DAN EVALUASI
+
+Bab ini membahas tahapan uji coba, kemudian hasil uji coba dievaluasi terhadap kinerja dari sistem yang dibangun.
+
+\item Bab 6 : KESIMPULAN DAN SARAN
+
+Bab ini merupakan bab yang menyampaikan kesimpulan dari hasil uji coba yang dilakukan, masalah-masalah yang dialami pada proses dan tertulis saat pengerjaan Tugas Akhir, dan saran untuk  pengembangan solusi kedepannya.
+
+\end{enumerate}

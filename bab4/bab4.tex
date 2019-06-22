@@ -1,0 +1,773 @@
+\chapter {IMPLEMENTASI}
+
+\section{Lingkungan Implementasi}
+
+Lingkungan implementasi dan pengembangan menggunakan sebuah komputer dengan spesifikasi perangkat lunak dan perangkat keras sebagai berikut.
+
+\begin{enumerate}
+	\item Perangkat Keras
+	\par Implementasi tugas akhir ini menggunakan desktop personal computer ASUS X555Q. Namun digunakan untuk menjalankan Google Colab dengan spesifikasi :
+	\begin{enumerate}
+		\item GPU: 1x Tesla K80 , having 2496 CUDA cores, compute 3.7, 12GB(11.439GB Usable) GDDR5 VRAM
+		\item CPU: 1x single core hyper threaded i.e(1 core, 2 threads) Xeon Processors @2.3Ghz (No Turbo Boost) , 45 MB Cache
+	\end{enumerate}
+	\item Perangkat Lunak
+	\begin{enumerate}
+		\item Sistem Operasi Linux 18.04 64-bit
+		\item Android Studio
+		\item Bahasa Pemrograman Java
+		\item Bahasa Pemrograman Python
+		\item Library Keras
+	\end{enumerate}
+\end{enumerate}
+
+\section{Implementasi Ekstraksi Fitur}
+Subbab ini menjabarkan implementasi ekstraksi fitur. 
+
+\begin{lstlisting}[language=java, caption=Konfigurasi, label=code:config, firstnumber=1]
+{
+"model"           : "mobilenet",
+"weights"         : "imagenet",
+"include_top"     : false,
+
+"train_path"      : "../RGB",
+"test_path"		  : "test",
+"features_path"   : "mobilenet/features.h5",
+"labels_path"     : "mobilenet/labels.h5",
+"results"         : "mobilenet/results.txt",
+"classifier_path" : "mobilenet/classifier.pickle",
+"model_path"	  : "mobilenet/model",
+
+"test_size"       : 0.3,
+"seed"            : 9,
+"num_classes"     : 42
+}
+\end{lstlisting}
+\par Konfigurasi yang dapat diatur antara lain nama model, bobot, train path atau direktori folder yang akan dilatih, features path atau direktori file untuk menyimpan fitur, label path atau direktori file untuk menyimpan label, test size atau perbandingan rasio antara data test dan data train, results atau direktori file untuk menyimpan hasil train keseluruhan. 
+\begin{lstlisting}[language=python, caption=Membaca konfigurasi, label=code:open_config, firstnumber=37]
+	with open('conf/conf.vgg19.json') as f:
+	config = json.load(f)
+	
+	model_name = config["model"]
+	weights = config["weights"]
+	include_top = config["include_top"]
+	train_path = config["train_path"]
+	features_path = config["features_path"]
+	labels_path = config["labels_path"]
+	test_size = config["test_size"]
+	results = config["results"]
+	model_path = config["model_path"]
+\end{lstlisting}
+\par Fungsi untuk membaca konfigurasi dari file berbentuk json. 
+
+\begin{lstlisting}[language=python, caption=Menentukan arsitektur untuk ekstraksi fitur, label=code:choose_architecture, firstnumber=58]
+if model_name == "vgg16":
+base_model = VGG16(weights=weights)
+model = Model(inputs=base_model.input, outputs=base_model.get_layer('fc1').output)
+image_size = (224, 224)
+
+elif model_name == "vgg19":
+base_model = VGG19(weights=weights)
+model = Model(input=base_model.input, output=base_model.get_layer('fc1').output)
+image_size = (224, 224)
+
+elif model_name == "resnet50":
+base_model = ResNet50(weights=weights)
+lastLayer = base_model.layers[-2]
+model = Model(input=base_model.input, output=lastLayer.output)  # base_model.get_layer('custom').output)
+image_size = (224, 224)
+
+elif model_name == "inceptionv3":
+base_model = InceptionV3(include_top=include_top, weights=weights, input_tensor=Input(shape=(299, 299, 3)))
+output = base_model.output
+model = Model(inputs=base_model.input, outputs=output)  # base_model.get_layer('custom').output)
+image_size = (299, 299)
+
+elif model_name == "mobilenet":
+base_model = MobileNet(include_top=include_top, weights=weights, input_tensor=Input(shape=(224, 224, 3)),
+input_shape=(224, 224, 3))
+output = base_model.output
+model = Model(inputs=base_model.input, outputs=output)  # base_model.get_layer('custom').output)
+image_size = (224, 224)
+elif model_name == "xception":
+base_model = Xception(weights=weights)
+model = Model(input=base_model.input, output=base_model.get_layer('avg_pool').output)
+image_size = (299, 299)
+else:
+base_model = None
+\end{lstlisting}
+\par Fungsi untuk menentukan arsitektur apa yang akan digunakan untuk mengekstraksi fitur dari file konfigurasi json.
+
+\begin{lstlisting}[language=python, caption=Preproses Data, label=code:preprocess, firstnumber=123]
+count = 1
+for i, label in enumerate(train_labels):
+cur_path = train_path + "/" + label
+count = 1
+for image_path in glob.glob(cur_path + "/*.JPG"):
+img = image.load_img(image_path, target_size=image_size)
+x = image.img_to_array(img)
+x = np.expand_dims(x, axis=0)
+x = preprocess_input(x)
+feature = model.predict(x)
+flat = feature.flatten()  ### double flatten dg diatas
+features.append(flat)
+labels.append(label)
+print("[INFO] processed - " + str(count))
+count += 1
+print("[INFO] completed label - " + label)
+\end{lstlisting} 
+
+\par Fungsi untuk melakukan preproses pada data gambar dan mengekstraksi fiturnya menggunakan arsitektur yang telah dipilih.
+
+\begin{lstlisting}[language=python, caption=Menyimpan hasil ekstraksi fitur, label=code:save_h5, firstnumber=149]
+h5f_data = h5py.File(features_path, 'w')
+h5f_data.create_dataset('dataset_1', data=np.array(features))
+
+h5f_label = h5py.File(labels_path, 'w')
+h5f_label.create_dataset('dataset_1', data=np.array(le_labels))
+
+h5f_data.close()
+h5f_label.close() 
+\end{lstlisting}
+
+\par Fungsi untuk menyimpan hasil ekstraksi fitur beserta labelnya masing-masing kedalam file berekstensi h5.
+
+\section{Implementasi Pelatihan}
+\par Berikut adalah implementasi sumber kode untuk melakukan pelatihan dari data yang sudah diekstraksi. 
+
+\begin{lstlisting}[language=python, caption=Membaca file hasil ekstraksi fitur, label=code:read_h5, firstnumber=34]
+h5f_data  = h5py.File(features_path, 'r')
+h5f_label = h5py.File(labels_path, 'r')
+
+features_string = h5f_data['dataset_1']
+labels_string   = h5f_label['dataset_1']
+
+features = np.array(features_string)
+labels   = np.array(labels_string)
+
+h5f_data.close()
+h5f_label.close()
+\end{lstlisting}
+
+Fungsi untuk membaca hasil dari ekstraksi fitur yang disimpan dalam file h5. Hasilnya kemudian diubah kebentuk numpy array dan file h5 ditutup.
+
+\begin{lstlisting}[language=python, caption=Membagi data test dan data train, label=code:train_test_split, firstnumber=52]
+(trainData, testData, trainLabels, testLabels) = train_test_split(np.array(features),
+np.array(labels),
+test_size=test_size,
+random_state=seed)
+\end{lstlisting}
+
+\par Melakukan pembagian dataset menjadi data train dan data test yang rasionya dapat diatur pada file konfigurasi.
+
+\begin{lstlisting}[language=python, caption=Penyesuaian dengan \textit{Logistic Regression}, label=code:logistic, firstnumber=65]
+model = LogisticRegression(random_state=seed)
+model.fit(trainData, trainLabels)
+\end{lstlisting}
+\par Menggunakan metode klasifikasi \textit{Logistic Regression} untuk mempelajari hubungan antara data dan label untuk memprediksi hasil uji di tahap berikutnya.
+
+\begin{lstlisting}[language=python, caption=Melakukan Prediksi Probabilitas, label=code:predict_proba, firstnumber=74]
+for (label, features) in zip(testLabels, testData):
+# predict the probability of each class label and
+# take the top-5 class labels
+predictions = model.predict_proba(np.atleast_2d(features))[0]
+predictions = np.argsort(predictions)[::-1][:5]
+
+# rank-1 prediction increment
+if label == predictions[0]:
+rank_1 += 1
+
+# rank-5 prediction increment
+if label in predictions:
+rank_5 += 1
+
+rank_1 = (rank_1 / float(len(testLabels))) * 100
+rank_5 = (rank_5 / float(len(testLabels))) * 100
+
+f.write("Rank-1: {:.2f}%\n".format(rank_1))
+f.write("Rank-5: {:.2f}%\n\n".format(rank_5))
+
+\end{lstlisting}
+\par Fungsi untuk menghitung akurasi dari prediksi probabilitas rank-1 dan rank-5. Yang dimaksud rank-1 adalah apabila hasil prediksi pertama atau yang probabilitasnya paling tinggi. Yang dimaksud rank-5 adalah lima hasil prediksi dengan probabilitas tertinggi. Apabila hasil prediksi sama dengan label, variabel rank-1 bertambah. Apabila label ada di rank-5, variabel rank-5 bertambah.
+
+\begin{lstlisting}[language=python, caption=Menyimpan model dan hasil, label=code:save_model, firstnumber=105]
+# evaluate the model of test data
+preds = model.predict(testData)
+
+# write the classification report to file
+f.write("{}\n".format(classification_report(testLabels, preds)))
+f.close()
+
+# dump classifier to file
+pickle.dump(model, open(classifier_path, 'wb'))
+
+\end{lstlisting}
+
+\par Fungsi untuk menyimpan model dalam file classifier serta menyimpan hasil evaluasi dari model yang sudah dibuat ke dalam file berekstensi txt. 
+
+\section{Implementasi Aplikasi Android}
+\par Berikut adalah implementasi sumber kode dari aplikasi Android. 
+\subsection{Implementasi Kelas MainActivity}
+\begin{lstlisting}[language=Java, caption=Implementasi Kelas Main, label=code:main, firstnumber=23]
+public class MainActivity extends AppCompatActivity {
+Button predict;
+Button train;
+Button upload;
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.activity_main);
+predict = (Button) findViewById(R.id.predict);
+
+// Capture button clicks
+predict.setOnClickListener(new View.OnClickListener() {
+public void onClick(View arg0) {
+
+// Start NewActivity.class
+Intent myIntent = new Intent(MainActivity.this,
+PredictActivity.class);
+System.out.println("predict");
+startActivity(myIntent);
+}
+});
+
+upload = (Button) findViewById(R.id.upload);
+
+// Capture button clicks
+upload.setOnClickListener(new View.OnClickListener() {
+public void onClick(View arg0) {
+
+// Start NewActivity.class
+Intent myIntent = new Intent(MainActivity.this,
+UploadActivity.class);
+System.out.println("uploaded");
+startActivity(myIntent);
+}
+});
+
+train = (Button) findViewById(R.id.train);
+train.setOnClickListener(new View.OnClickListener() {
+@Override
+public void onClick(View v) {
+ApiClientAttendance api = Server.builder()
+.create(ApiClientAttendance.class);
+Call<ResponseApi> train = api.train();
+System.out.println("trained");
+final SweetAlertDialog pDialog = new SweetAlertDialog(MainActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+pDialog.getProgressHelper().
+setBarColor(Color.parseColor("#A5DC86"));
+pDialog.setTitleText("Loading");
+pDialog.setCancelable(false);
+pDialog.show();
+
+train.enqueue(new Callback<ResponseApi>() {
+@Override
+public void onResponse(Call<ResponseApi> call, Response<ResponseApi> response) {
+if (response.code() == 200) {
+pDialog.dismiss();
+new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+.setTitleText("Trained")
+.setContentText(response.body().getMsg())
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismiss();
+}
+}).show();
+} else {
+pDialog.dismiss();
+new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
+.setTitleText("Error")
+.setContentText("Terjadi kesalahan, mohon ulangi lagi.")
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismiss();
+}
+}).show();
+}
+}
+
+@Override
+public void onFailure(Call<ResponseApi> call, Throwable t) {
+pDialog.dismiss();
+new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
+.setTitleText("Hasil")
+.setContentText("Internet Anda Bermasalah")
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismissWithAnimation();
+}
+}).show();
+System.out.println(t);
+}
+});
+}
+});
+cek();
+}
+}
+\end{lstlisting}
+\par Pada kelas MainActivity akan dipanggil file \textbf{activity\_main.xml} yang akan menghasilkan tampilan pada laman pertama di aplikasi. Tampilan yang muncul adalah seperti ini.
+\begin{figure}[H]
+	\centering\includegraphics[width=0.7\textwidth]{bab4/figures/main.png}
+	\caption{Tampilan awal}
+	\label{fig:main}
+\end{figure}
+\subsection{Implementasi Kelas UploadActivity}
+\par Pada kelas UploadActivity pengguna dapat mengunggah gambar beberapa kali dengan nama daun tertentu. Dengan adanya unggahan dari pengguna maka dataset akan bertambah.
+
+\begin{lstlisting}[language=Java, caption=Implementasi Fitur Upload, label=code:upload, firstnumber=53, breaklines]
+
+public class UploadActivity extends AppCompatActivity {
+private static final String LOGGING_TAG = "Upload Activity";
+private CameraView cameraView;
+private final PermissionsDelegate permissionsDelegate = new PermissionsDelegate(this);
+private boolean hasCameraPermission;
+
+private CameraKitEventListener cameradListener;
+private Button capture;
+private EditText textView;
+
+private Fotoapparat fotoapparat;
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.activity_upload);
+cameraView = findViewById(R.id.camera_view);
+capture = findViewById(R.id.btn_capture);
+hasCameraPermission = permissionsDelegate.hasCameraPermission();
+
+if (hasCameraPermission) {
+cameraView.setVisibility(View.VISIBLE);
+} else {
+permissionsDelegate
+.requestCameraPermission();
+}
+
+fotoapparat = createFotoapparat();
+takePictureOnClick();
+}
+private Fotoapparat createFotoapparat() {
+return Fotoapparat
+.with(this)
+.into(cameraView)
+.previewScaleType(ScaleType.CenterCrop)
+.lensPosition(back())
+.logger(loggers(
+logcat(),
+fileLogger(this)
+))
+.cameraErrorCallback(new CameraErrorListener() {
+@Override
+public void onError(CameraException e) {
+Toast.makeText(UploadActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+}
+})
+.build();
+}
+
+private void takePictureOnClick() {
+capture.setOnClickListener(new View.OnClickListener() {
+@RequiresApi(api = Build.VERSION_CODES.FROYO)
+@Override
+public void onClick(View v) {
+takePicture();
+}
+});
+}
+
+@RequiresApi(api = Build.VERSION_CODES.FROYO)
+private void takePicture() {
+PhotoResult photoResult = fotoapparat.takePicture();
+
+photoResult.saveToFile(new File(
+getExternalFilesDir("photos"),
+"photo.jpg"
+));
+
+photoResult
+.toBitmap(scaled(0.25f))
+.whenDone(new WhenDoneListener<BitmapPhoto>() {
+@Override
+public void whenDone(@Nullable BitmapPhoto bitmapPhoto) {
+if (bitmapPhoto == null) {
+Log.e(LOGGING_TAG, "Couldn't capture photo.");
+return;
+}
+Log.d("cek", "whenDone: "+bitmapPhoto);
+ImageView imageView = findViewById(R.id.gambar);
+Bitmap bitmap1 = RotateBitmap(bitmapPhoto.bitmap,
+-bitmapPhoto.rotationDegrees+180);
+bitmap1 = flip(bitmap1);
+send(bitmap1);
+}
+});
+}
+
+
+public static Bitmap RotateBitmap(Bitmap source, float angle) {
+Matrix matrix = new Matrix();
+matrix.postRotate(angle);
+return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+}
+
+public Bitmap flip(Bitmap bitmap) {
+Bitmap bOutput;
+Matrix matrix = new Matrix();
+matrix.preScale(1.0f, -1.0f);
+bOutput = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+return bOutput;
+}
+
+public void send(Bitmap bitmap) {
+Bitmap result = Bitmap.createScaledBitmap(bitmap, 96,96, true);
+textView = (EditText) findViewById(R.id.name);
+String name = textView.getText().toString();
+String myBase64Image = Constans.encodeToBase64(result, Bitmap.CompressFormat.JPEG, 100);
+ApiClientAttendance api = Server.builder()
+.create(ApiClientAttendance.class);
+Call<ResponseApi> upload = api.upload(name,
+ "data:image/jpeg;base64,"+myBase64Image);
+
+final SweetAlertDialog pDialog = new SweetAlertDialog(UploadActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+pDialog.getProgressHelper()
+.setBarColor(Color.parseColor("#A5DC86"));
+pDialog.setTitleText("Loading");
+pDialog.setCancelable(false);
+pDialog.show();
+
+upload.enqueue(new Callback<ResponseApi>() {
+@Override
+public void onResponse(Call<ResponseApi> call, Response<ResponseApi> response) {
+if (response.code() == 200) {
+pDialog.dismiss();
+new SweetAlertDialog(UploadActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+.setTitleText("Hasil")
+.setContentText(response.body().getMsg())
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismiss();
+}
+}).show();
+} else {
+pDialog.dismiss();
+new SweetAlertDialog(UploadActivity.this, SweetAlertDialog.WARNING_TYPE)
+.setTitleText("Error")
+.setContentText("Terjadi kesalahan, mohon ulangi lagi.")
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismiss();
+}
+}).show();
+}
+}
+
+@Override
+public void onFailure(Call<ResponseApi> call, Throwable t) {
+pDialog.dismiss();
+new SweetAlertDialog(UploadActivity.this, SweetAlertDialog.ERROR_TYPE)
+.setTitleText("Hasil")
+.setContentText("Internet Anda Bermasalah")
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismissWithAnimation();
+}
+}).show();
+System.out.println(t);
+}
+});
+}
+
+@Override
+protected void onStart() {
+super.onStart();
+if (hasCameraPermission) {
+fotoapparat.start();
+}
+}
+
+@Override
+protected void onStop() {
+super.onStop();
+if (hasCameraPermission) {
+fotoapparat.stop();
+}
+}
+
+@Override
+public void onRequestPermissionsResult(int requestCode,
+@NonNull String[] permissions,
+@NonNull int[] grantResults) {
+super.onRequestPermissionsResult(
+requestCode, permissions, grantResults);
+if (permissionsDelegate.resultGranted(
+requestCode, permissions, grantResults)) {
+hasCameraPermission = true;
+fotoapparat.start();
+cameraView.setVisibility(View.VISIBLE);
+}
+}
+}
+\end{lstlisting}
+
+\par Fitur Upload menggunakan library \textit{fotoapparat} untuk membuka kamera pada ponsel. Gambar yang ditangkap akan diubah dalam bentuk string sebelum dikirim ke server. Untuk mengirim data ke server digunakan library Retrofit2.
+
+\par Berikut adalah tampilan dari laman upload.
+\begin{figure}[H]
+	\centering\includegraphics[width=0.7\textwidth]{bab4/figures/upload.png}
+	\caption{Tampilan Upload}
+	\label{fig:upload}
+\end{figure}
+\subsection{Implementasi Kelas PredictActivity}
+\begin{lstlisting}[language=Java, caption=Implementasi Kelas PredictActivity, label=code:predict, firstnumber=48]
+public class PredictActivity extends AppCompatActivity {
+private static final String LOGGING_TAG = "New Predict Activity";
+
+private final PermissionsDelegate permissionsDelegate = new PermissionsDelegate(this);
+private boolean hasCameraPermission;
+private RelativeLayout cameraLayout;
+private CameraView cameraView;
+private Button capture;
+private Fotoapparat fotoapparat;
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.activity_predict);
+
+cameraLayout = findViewById(R.id.CameraLayout);
+cameraView = findViewById(R.id.camera_view);
+capture = findViewById(R.id.btn_capture);
+hasCameraPermission = permissionsDelegate.hasCameraPermission();
+
+
+cameraLayout.getLayoutParams().height = cameraLayout.getLayoutParams().width;
+
+if (hasCameraPermission) {
+cameraView.setVisibility(View.VISIBLE);
+} else {
+permissionsDelegate.requestCameraPermission();
+}
+
+fotoapparat = createFotoapparat();
+takePictureOnClick();
+}
+
+private Fotoapparat createFotoapparat() {
+return Fotoapparat
+.with(this)
+.into(cameraView)
+.previewScaleType(ScaleType.CenterCrop)
+.lensPosition(back())
+.logger(loggers(
+logcat(),
+fileLogger(this)
+))
+.cameraErrorCallback(new CameraErrorListener() {
+@Override
+public void onError(@NotNull CameraException e) {
+Toast.makeText(PredictActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+}
+})
+.build();
+}
+
+private void takePictureOnClick() {
+capture.setOnClickListener(new View.OnClickListener() {
+@RequiresApi(api = Build.VERSION_CODES.FROYO)
+@Override
+public void onClick(View v) {
+takePicture();
+}
+});
+}
+
+@RequiresApi(api = Build.VERSION_CODES.FROYO)
+private void takePicture() {
+PhotoResult photoResult = fotoapparat.takePicture();
+
+photoResult.saveToFile(new File(
+getExternalFilesDir("photos"),
+"photo.jpg"
+));
+
+photoResult
+.toBitmap(scaled(0.25f))
+.whenDone(new WhenDoneListener<BitmapPhoto>() {
+@Override
+public void whenDone(@Nullable BitmapPhoto bitmapPhoto) {
+if (bitmapPhoto == null) {
+Log.e(LOGGING\_TAG, "Couldn't capture photo.");
+return;
+}
+Log.d("cek", "whenDone: " + bitmapPhoto);
+ImageView imageView = findViewById(R.id.gambar);
+Bitmap bitmap1 = RotateBitmap(bitmapPhoto.bitmap, -bitmapPhoto.rotationDegrees + 180);
+bitmap1 = flip(bitmap1);
+send(bitmap1);
+}
+});
+}
+
+public static Bitmap RotateBitmap(Bitmap source, float angle) {
+Matrix matrix = new Matrix();
+matrix.postRotate(angle);
+return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+}
+
+public Bitmap flip(Bitmap bitmap) {
+Bitmap bOutput;
+Matrix matrix = new Matrix();
+matrix.preScale(1.0f, -1.0f);
+bOutput = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+return bOutput;
+}
+
+@Override
+protected void onStart() {
+super.onStart();
+if (hasCameraPermission) {
+fotoapparat.start();
+}
+}
+
+@Override
+protected void onStop() {
+super.onStop();
+if (hasCameraPermission) {
+fotoapparat.stop();
+}
+}
+
+@Override
+public void onRequestPermissionsResult(int requestCode,
+@NonNull String[] permissions,
+@NonNull int[] grantResults) {
+super.onRequestPermissionsResult(
+requestCode, permissions, grantResults);
+if (permissionsDelegate.resultGranted(
+requestCode, permissions, grantResults)) {
+hasCameraPermission = true;
+fotoapparat.start();
+cameraView.setVisibility(View.VISIBLE);
+}
+}
+
+public void send(Bitmap bitmap) {
+Bitmap result = Bitmap.createScaledBitmap(bitmap, 96, 96, true);
+String myBase64Image = Constans.encodeToBase64(result, Bitmap.CompressFormat.JPEG, 100);
+
+Call<ResponseApi> predict;
+ApiClientAttendance api = Server.builder()
+.create(ApiClientAttendance.class);
+predict = api.predict("data:image/jpeg;base64," + myBase64Image);
+
+final SweetAlertDialog pDialog = new SweetAlertDialog(PredictActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+pDialog.getProgressHelper()
+.setBarColor(Color.parseColor("#A5DC86"));
+pDialog.setTitleText("Loading");
+pDialog.setCancelable(false);
+pDialog.show();
+
+predict.enqueue(new Callback<ResponseApi>() {
+@Override
+public void onResponse(Call<ResponseApi> call, Response<ResponseApi> response) {
+if (response.code() == 200) {
+pDialog.dismiss();
+
+String r = response.body().getMsg();
+String[] result = r.trim().split(",");
+
+if (result[0].equals("ACCEPTED")) {
+new SweetAlertDialog(PredictActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+.setTitleText("Hasil")
+.setContentText(response.body().getMsg())
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismiss();
+}
+}).show();
+} else {
+new SweetAlertDialog(PredictActivity.this, SweetAlertDialog.WARNING_TYPE)
+.setTitleText("Error")
+.setContentText(response.body().getMsg())
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismiss();
+}
+}).show();
+}
+} else {
+pDialog.dismiss();
+new SweetAlertDialog(PredictActivity.this, SweetAlertDialog.WARNING_TYPE)
+.setTitleText("Error")
+.setContentText("Terjadi kesalahan, mohon ulangi kembali.")
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismiss();
+}
+}).show();
+}
+}
+
+@Override
+public void onFailure(Call<ResponseApi> call, Throwable t) {
+pDialog.dismiss();
+new SweetAlertDialog(PredictActivity.this, SweetAlertDialog.ERROR_TYPE)
+.setTitleText("Error")
+.setContentText("Terdapat masalah dengan koneksi anda, mohon ulangi kembali.")
+.setConfirmText("OK")
+.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+@Override
+public void onClick(SweetAlertDialog sDialog) {
+sDialog.dismissWithAnimation();
+}
+}).show();
+}
+});
+}
+}
+\end{lstlisting}
+
+\par Kelas PredictActivity mirip seperti kelas UploadActivity dalam hal tampilan, bedanya adalah kelas ini ketika menembak API pada server akan mendapatkan response berupa nama daun yang diprediksi. Tampilan dari fitur Predict adalah sebagai berikut.
+\begin{figure}[H]
+	\centering\includegraphics[width=0.7\textwidth]{bab4/figures/predict.png}
+	\caption{Tampilan Predict}
+	\label{fig:predict}
+\end{figure}
+\subsection{API}
+\par Berikut adalah sumber kode untuk memanggil API pada server.
+
+\begin{lstlisting}[language=python, caption=Pemanggilan API menggunakan Retrofit2, label=code:api, firstnumber=0]
+public interface ApiClientAttendance {
+@FormUrlEncoded
+@POST("/upload/")
+Call<ResponseApi> upload(@Field("name") String name,
+@Field("image") String image);
+
+@POST("/train/")
+Call<ResponseApi> train();
+
+@FormUrlEncoded
+@POST("/predict/")
+Call<ResponseApi> predict(@Field("image") String image);
+}
+\end{lstlisting}

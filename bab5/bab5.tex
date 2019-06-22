@@ -1,0 +1,46 @@
+\chapter{UJI COBA DAN EVALUASI}
+Pada bab ini akan dijelaskan tentang uji coba dan evaluasi dari implementasi sistem yang telah dilakukan pada bab 4.
+
+\section{Lingkungan Uji Coba}
+Lingkungan uji coba menggunakan sebuah komputer dengan spesifikasi perangkat keras dan perangkat lunak sebagai berikut.
+
+\begin{enumerate}
+	\item Perangkat Keras
+	\begin{enumerate}
+		\item GPU: 1x Tesla K80 , having 2496 CUDA cores, compute 3.7, 12GB(11.439GB Usable) GDDR5 VRAM.
+		\item CPU: 1x single core hyper threaded i.e(1 core, 2 threads) Xeon Processors @2.3Ghz (No Turbo Boost) , 45 MB Cache.
+	\end{enumerate}
+	\item Perangkat Lunak
+	\begin{enumerate}
+		\item Sistem Operasi Linux Ubuntu 1804 64-bit
+		\item Android Studio
+		\item Bahasa Pemrograman Java
+		\item Bahasa Pemrograman Python
+		\item Library Keras
+	\end{enumerate}
+\end{enumerate}
+
+\section{Dataset}
+\par Dataset yang digunakan adalah dataset daun dari \url{https://archive.ics.uci.edu/ml/datasets/leaf}. Dataset ditambahkan dengan dataset dari penulis sendiri. Dataset akan dipecah dengan rasio 7 : 3 untuk data train dan data test. 
+
+\section{Uji Coba Ekstraksi Fitur Menggunakan Pre-Trained Model}
+
+\par Hasil dari evaluasi pembuatan model yang diekstraksi dengan \textit{pre-trained model} yang disediakan adalah :
+
+
+\begin{table}[ht]
+	\centering
+	\begin{tabularx}{1.0\textwidth}
+		{|X*{6}{c}|X|X|X|X|X|}
+	\hline
+	\centering Model&Rank-1&Rank-5&Precision&Recall&F1 Score \\ \hline
+	\centering VGG16	& 	95.62	& 100.0	& 	97.0	& 96.0	&	95.0 \\ \hline
+	\centering VGG19	& 94.89	&	98.54 &	96.0	&95.0	& 94.0 \\ \hline
+	\centering MobileNet	&	96.35	& 100.0	& 97.0	& 96.0 &	96.0 \\ \hline
+	\centering ResNet50	& 53.28	& 88.32 &	61.0	& 53.0	& 51.0 \\ \hline
+	\centering InceptionV3	&	93.43	& 100.0	& 95.0 & 93.0 & 93.0 \\ \hline
+	\centering Xception	&	93.43	& 100.0	& 95.0 & 93.0 & 93.0 \\
+	\end{tabularx}
+	\caption{Tabel data hasil evaluasi model}
+	\label{table:hasil}
+\end{table}
