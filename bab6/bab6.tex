@@ -5,17 +5,16 @@ Bab ini membahas tentang kesimpulan yang didasari oleh hasil uji coba yang telah
 Dalam pengerjaan Tugas Akhir ini setelah melalui tahap perancangan aplikasi, implementasi metode, serta uji coba, diperoleh kesimpulan sebagai berikut:
 
 \begin{enumerate}
-	\item Arsitektur yang paling akurat dalam mendeteksi daun menggunakan Logistic Regression adalah MobileNet.
-	\item Pada metode transfer learning, hampir semua arsitektur mendapatkan akurasi diatas 90\% kecuali ResNet50.
-	\item Dataset daun tidak cocok jika fiturnya diekstraksi dengan ResNet50, yang menyebabkan akurasi kurang dari 60\%.
-	\item Arsitektur MobileNet juga merupakan arsitektur paling ringan, dengan ukuran 91 MB dibandingkan arsitektur lain yang sampai ratusan MB.
+	\item Untuk mengimplementasi \textit{transfer learning} untuk mendeteksi daun digunakan library Keras dan pengimplementasian ekstraksi fitur menggunakan model yang tersedia.
+	\item Untuk mengembangkan aplikasi pendeteksi daun berbasis Android yang mengirim gambar ke server dan menerima balasan berupa jenis daun diterapkan REST API untuk memanggil server yang kemudian akan mengirim balasan ke Android. Untuk memanggil server digunakan Retrofit2.
+	\item Untuk melakukan proses klasifikasi daun pada server, digunakan model yang telah disimpan untuk mengklasifikasi jenis daun.
+	\item Arsitektur yang paling akurat dalam mendeteksi daun menggunakan Logistic Regression adalah MobileNet, dengan akurasi 96%.
 \end{enumerate}
 
 \section{Saran}
 Berikut merupakan beberapa saran untuk pengembangan sistem di masa yang akan datang. Saran-saran ini didasarkan pada hasil perancangan, implementasi, dan uji coba yang telah dilakukan.
 \begin{enumerate}
 	\item Diperlukan hardware yang mumpuni untuk melatih model.
-	\item Jika ingin menggunakan ResNet mungkin dapat dicoba dengan ResNet yang layernya lebih banyak seperti ResNet152.
 	\item Memperbaiki desain pada aplikasi Android, termasuk pemilihan warna dan tata letak.
 	\item Membuat tombol "Bantuan" untuk mempermudah pengguna.
 \end{enumerate}

@@ -7,7 +7,7 @@ Bab ini menjelaskan konteks tugas akhir yang akan dikerjakan, termasuk latar bel
 \par Teknologi informasi pada abad ini mengalami perkembangan yang pesat dan mempengaruhi hampir seluruh aspek dalam kehidupan manusia. Teknologi perangkat bergerak atau \textit{mobile device} menjadi salah satu teknologi yang saat ini banyak memunculkan inovasi - inovasi baru. Di tahun 2000, komunikasi dilakukan melalui banyak jaringan. Telepon genggam hanya bisa untuk menelepon dan menerima pesan singkat. Sekarang, pemesanan transportasi, pemesanan makanan, \textit{fintech} atau teknologi finansial, situs belanja online dan lain-lain banyak dikembangkan di perangkat bergerak.  
 
 \par Selain teknologi berbasis perangkat bergerak, teknologi yang sedang gencar-gencarnya dikembangkan saat ini adalah \textit{Artificial Intelligence} atau Kecerdasan Buatan. Kecerdasan buatan didefinisikan sebagai kecerdasan entitas ilmiah yang dimasukkan ke dalam sebuah mesin agar dapat melakukan pekerjaan seperti yang dapat dilakukan manusia \cite{ai_def}. Beberapa macam bidang yang menggunakan kecerdasan buatan antara lain sistem pakar, permainan komputer (games), logika fuzzy, jaringan syaraf tiruan dan robotika. Pada pengolahan citra digital kecerdasan buatan juga digunakan untuk mendeteksi wajah, kebakaran, keributan dan lain-lain.
-\par Pada Tugas Akhir ini, penulis akan mencoba mengimplementasikan suatu sistem untuk mengidentifikasi jenis daun berbasis android. Cara kerja aplikasi yang diusulkan adalah pengguna menangkap gambar daun dari ponsel mereka, lalu sistem akan mengirim gambar tersebut ke server. Di server gambar daun tersebut akan melalui proses klasifikasi dengan kecerdasan buatan. Metode yang akan digunakan untuk mengklasifikasi daun tersebut adalah \textit{Transfer Learning}. Kemudian hasil dari klasifikasi tersebut akan dikirim lagi ke ponsel pengguna. 
+\par Pada Tugas Akhir ini, penulis akan mencoba mengimplementasikan suatu sistem untuk mengidentifikasi jenis daun berbasis android. Cara kerja aplikasi yang diusulkan adalah pengguna menangkap gambar daun dari ponsel mereka, lalu sistem akan mengirim gambar tersebut ke server. Di server gambar daun tersebut akan melalui proses klasifikasi dengan pembelajaran dalam. Metode yang akan digunakan untuk mengklasifikasi daun tersebut adalah \textit{Transfer Learning}. Kemudian hasil dari klasifikasi tersebut akan dikirim lagi ke ponsel pengguna. 
 \par Penulis berharap dengan adanya aplikasi ini akan meningkatkan pengetahuan pengguna tentang manfaat daun-daun di sekitarnya.
 
 \section {Rumusan Masalah}
@@ -16,7 +16,7 @@ Permasalahan yang akan diselesaikan pada tugas akhir ini adalah sebagai berikut:
 
 \begin {enumerate}
 \item Bagaimana mengimplementasikan \textit{transfer learning} untuk mendeteksi jenis daun? 
-\item Bagaimana mengembangkan sebuah aplikasi berbasis android yang mengirim gambar ke server dan menerima balasan berupa jenis dan manfaat daun?
+\item Bagaimana mengembangkan sebuah aplikasi berbasis android yang mengirim gambar ke server dan menerima balasan berupa jenis daun?
 \item Bagaimana melakukan proses klasifikasi daun pada server?
 \item Arsitektur \textit{transfer learning} mana yang lebih akurat dalam mendeteksi jenis daun? 
 \end {enumerate}
@@ -25,8 +25,9 @@ Permasalahan yang akan diselesaikan pada tugas akhir ini adalah sebagai berikut:
 
 Batasan masalah yang terdapat pada Tugas Akhir ini adalah sebagai berikut : 
 \begin {enumerate}
-\item Implementasi program menggunakan bahasa pemrograman Java untuk Android dan Python untuk mendeteksi daun. 
+\item Implementasi program menggunakan bahasa pemrograman Java untuk Android serta \textit{backend} dan Python untuk mendeteksi daun. 
 \item Implementasi aplikasi android untuk mengirim gambar daun ke server dan menampilkan balasan berupa jenis daun.
+\item Android yang digunakan minimal API 21 atau Lollipop versi 5.0
 \item Sistem pengenalan daun dirancang untuk deteksi satu daun dalam satu gambar. 
 \item Dataset diperoleh dari https://archive.ics.uci.edu/ml/datasets/leaf yang ditambahkan dengan dataset dari penulis sendiri. 
 \end {enumerate}
