@@ -1,6 +1,6 @@
 \chapter{PERANCANGAN SISTEM}
 
-Bab ini menjelaskan mengenai perancangan data dan sistem rancang bangun aplikasi pendeteksi daun berbasis Android. Bab ini juga akan menjelaskan gambaran umum sistem.
+Bab ini menjelaskan mengenai perancangan data dan sistem rancang bangun aplikasi pendeteksi daun berbasis Android. Bab ini juga akan menjelaskan gambaran sistem.
 
 \section{Perancangan Data}
 \par Data yang digunakan sebagai masukan awal dari sistem rancang bangun aplikasi pendeteksi daun berbasis Android adalah dataset yang dibuat Pedro F. B. Silva dan Andra Marasal menggunakan spesimen Rubim Almeida da Silva dari the Faculty of Science, University of Porto, Portugal. Dataset tersebut berisi 483 data yang terbagi dalam 40 kelas. 
@@ -25,8 +25,36 @@ Bab ini menjelaskan mengenai perancangan data dan sistem rancang bangun aplikasi
 
 \par Selain dataset dari Pedro F. B. Silva dan Andra Marasal, penulis akan menambahkan dataset sendiri dengan daun-daun yang umum ditemukan di Indonesia. Adapun gambar-gambar yang akan ditambahkan penulis lebih tidak teratur dalam artian latar belakangnya bisa berwarna-warni dan mengandung noise.
 
-\section{Desain Umum Sistem}
-\par Desain umum dari sistem pendeteksi daun berbasis Android ini terdiri dari tiga bagian, yaitu tahap pembuatan model, aplikasi Android dan \textit{back-end}. 
+\section{Desain Sistem}
+\par Terdapat tiga fungsi utama dari sistem, yaitu Train, Upload dan Predict. Fungsi Train memungkinkan pengguna untuk melatih ulang model yang telah dibuat. Fungsi Upload memungkinkan pengguna untuk menambahkan dataset gambar daun pada server. Fungsi Predict memungkinkan pengguna untuk mengetahui hasil dari prediksi jenis daun.
+
+\par Adapun diagram alir dari Fungsi Train, Upload dan Predict adalah sebagai berikut. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{bab3/figures/train.png}
+	\caption{Diagram alir fungsi Train}
+	\label{fig:Ng1} 
+\end{figure}
+\begin{figure}[H]
+	\centering
+	
+	\begin{subfigure}[b]{0.75\textwidth}
+		\includegraphics[width=1\linewidth]{bab3/figures/upload.png}
+		\caption{Diagram alir fungsi Upload}
+		\label{fig:Ng2}
+	\end{subfigure}
+
+	\begin{subfigure}[b]{0.75\textwidth}
+	\includegraphics[width=1\linewidth]{bab3/figures/predict.png}
+	\caption{Diagram alir fungsi Predict}
+	\label{fig:Ng2}
+\end{subfigure}
+	
+	\caption{Diagram alir dari fungsi-fungsi pada aplikasi}
+\end{figure}
+
+
+\par Desain dari sistem pendeteksi daun berbasis Android ini terdiri dari tiga bagian, yaitu tahap pembuatan model, aplikasi Android dan \textit{back-end}. 
 \par Tahap pembuatan model terdiri dari tahap ekstraksi fitur dan pelatihan. Aplikasi Android menyediakan antar-muka yang menghubungkan antara pengguna dan server. \textit{Back-end} dijalankan di server dan berfungsi sebagai API atau \textit{Application Programming Interface} antara aplikasi android dan model.
 \subsection{Pembuatan Model}
 \par Tahap ekstraksi fitur dilakukan paling awal dalam tahap membuat model. Gambar diekstraksi fiturnya dengan menggunakan arsitektur-arsitektur yang akan diuji dan dibandingkan. Setelah fitur-fitur pada gambar diekstraksi dan disimpan dalam file, dilakukan tahap pelatihan. 
